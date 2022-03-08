@@ -33,61 +33,42 @@ class App extends Component<MyProps, MyState> {
     this.refreshList();
   }
 
-  refreshList = () => {
-    axios
-      .get("/api/todos/")
-      .then((res) => this.setState({ todoList: res.data }))
-      .catch((err) => console.log(err));
-  };
-
   toggle = () => {
     this.setState({ modal: !this.state.modal });
   };
 
-  // handleSubmit = (item) => {
-  //   this.toggle();
-
-  //   if (item.id) {
-  //     axios
-  //       .put(`/api/todos/${item.id}/`, item)
-  //       .then((res) => this.refreshList());
-  //     return;
-  //   }
-  //   axios.post("/api/todos/", item).then((res) => this.refreshList());
-  // };
-
-  // handleDelete = (item) => {
-  //   axios.delete(`/api/todos/${item.id}/`).then((res) => this.refreshList());
-  // };
+  refreshList = async () => {
+    await axios
+      .get("/api/todos/", {
+        headers: { "X-CSRFToken": csrftoken },
+      })
+      .then((res) => this.setState({ todoList: res.data }))
+      .catch((err) => console.log(err));
+  };
 
   handleSubmit = async (item) => {
     this.toggle();
 
     if (item.id) {
-      await axios({
-        method: "put",
-        url: `/api/todos/${item.id}/`,
-        headers: { "X-CSRFToken": csrftoken },
-      }).then((res) => this.refreshList());
+      await axios
+        .put(`/api/todos/${item.id}/`, item, {
+          headers: { "X-CSRFToken": csrftoken },
+        })
+        .then((res) => this.refreshList());
       return;
     }
-    await axios({
-      method: "post",
-      url: "/api/todos/",
-      headers: { "X-CSRFToken": csrftoken },
-    }).then((res) => this.refreshList());
+    await axios
+      .post("/api/todos/", item, {
+        headers: { "X-CSRFToken": csrftoken },
+      })
+      .then((res) => this.refreshList());
   };
-
-  // handleDelete = (item) => {
-  //   axios.delete(`/api/todos/${item.id}/`).then((res) => this.refreshList());
-  // };
-
   handleDelete = async (item) => {
-    await axios({
-      method: "delete",
-      url: `/api/todos/${item.id}/`,
-      headers: { "X-CSRFToken": csrftoken },
-    }).then((res) => this.refreshList());
+    await axios
+      .delete(`/api/todos/${item.id}/`, {
+        headers: { "X-CSRFToken": csrftoken },
+      })
+      .then((res) => this.refreshList());
   };
 
   createItem = () => {
