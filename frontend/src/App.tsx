@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import Modal from "./components/Modal";
+import axios from "axios";
 
 const todoItems = [
   {
@@ -30,6 +32,8 @@ const todoItems = [
 type MyState = {
   viewCompleted: boolean;
   todoList: {} | any;
+  modal: boolean;
+  activeItem: {};
 };
 
 class App extends Component<MyState | any> {
@@ -37,11 +41,58 @@ class App extends Component<MyState | any> {
   // super(props);
   state: MyState = {
     viewCompleted: false,
-    todoList: todoItems,
+    todoList: [],
+    modal: false,
+    activeItem: {
+      title: "",
+      description: "",
+      completed: false,
+    },
   };
   // }
 
-  displayCompleted = (status) => {
+  componentDidMount() {
+    this.refreshList();
+  }
+
+  refreshList = () => {
+    axios
+      .get("/api/todos/")
+      .then((res) => this.setState({ todoList: res.data }))
+      .catch((err) => console.log(err));
+  };
+
+  toggle = () => {
+    this.setState({ modal: !this.state.modal });
+  };
+
+  handleSubmit = (item: any) => {
+    this.toggle();
+
+    if (item.id) {
+      axios
+        .put(`/api/todos/${item.id}/`, item)
+        .then((res) => this.refreshList());
+      return;
+    }
+    axios.post("/api/todos/", item).then((res) => this.refreshList());
+  };
+
+  handleDelete = (item: any) => {
+    axios.delete(`/api/todos/${item.id}/`).then((res) => this.refreshList());
+  };
+
+  createItem = () => {
+    const item = { title: "", description: "", completed: false };
+
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+
+  editItem = (item: any) => {
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+
+  displayCompleted = (status: boolean) => {
     if (status) {
       return this.setState({ viewCompleted: true });
     }
@@ -88,8 +139,18 @@ class App extends Component<MyState | any> {
           {item.title}
         </span>
         <span>
-          <button className="btn btn-secondary mr-2">Edit</button>
-          <button className="btn btn-danger">Delete</button>
+          <button
+            className="btn btn-secondary mr-2"
+            onClick={() => this.setState(item)}
+          >
+            Edit
+          </button>
+          <button
+            className="btn btn-danger"
+            onClick={() => this.handleDelete(item)}
+          >
+            Delete
+          </button>
         </span>
       </li>
     ));
@@ -102,7 +163,9 @@ class App extends Component<MyState | any> {
           <div className="col-md-6 col-sm-10 mx-auto p-0">
             <div className="card p-3">
               <div className="mb-4">
-                <button className="btn btn-primary">Add task</button>
+                <button className="btn btn-primary" onClick={this.createItem}>
+                  Add task
+                </button>
               </div>
               {this.renderTabList()}
               <ul className="list-group list-group-flush border-top-0">
@@ -111,6 +174,13 @@ class App extends Component<MyState | any> {
             </div>
           </div>
         </div>
+        {this.state.modal ? (
+          <Modal
+            activeItem={this.state.activeItem}
+            toggle={this.toggle}
+            onSave={this.handleSubmit}
+          />
+        ) : null}
       </main>
     );
   }

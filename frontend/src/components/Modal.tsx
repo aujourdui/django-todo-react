@@ -29,7 +29,7 @@ export default class CustomModal extends Component<ModalProps, ModalState> {
   };
   // }
 
-  handleChange = (e) => {
+  handleChange = (e: { target: { value: any; checked?: any; name?: any } }) => {
     let { name, value } = e.target;
 
     if (e.target.value === "checkbox") {
