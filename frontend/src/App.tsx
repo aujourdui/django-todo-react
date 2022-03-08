@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import Modal from "./components/Modal";
 import axios from "axios";
+import Cookies from "js-cookie";
+
+const csrftoken = Cookies.get("csrftoken");
 
 type MyProps = {};
 
@@ -41,20 +44,50 @@ class App extends Component<MyProps, MyState> {
     this.setState({ modal: !this.state.modal });
   };
 
-  handleSubmit = (item) => {
+  // handleSubmit = (item) => {
+  //   this.toggle();
+
+  //   if (item.id) {
+  //     axios
+  //       .put(`/api/todos/${item.id}/`, item)
+  //       .then((res) => this.refreshList());
+  //     return;
+  //   }
+  //   axios.post("/api/todos/", item).then((res) => this.refreshList());
+  // };
+
+  // handleDelete = (item) => {
+  //   axios.delete(`/api/todos/${item.id}/`).then((res) => this.refreshList());
+  // };
+
+  handleSubmit = async (item) => {
     this.toggle();
 
     if (item.id) {
-      axios
-        .put(`/api/todos/${item.id}/`, item)
-        .then((res) => this.refreshList());
+      await axios({
+        method: "put",
+        url: `/api/todos/${item.id}/`,
+        headers: { "X-CSRFToken": csrftoken },
+      }).then((res) => this.refreshList());
       return;
     }
-    axios.post("/api/todos/", item).then((res) => this.refreshList());
+    await axios({
+      method: "post",
+      url: "/api/todos/",
+      headers: { "X-CSRFToken": csrftoken },
+    }).then((res) => this.refreshList());
   };
 
-  handleDelete = (item) => {
-    axios.delete(`/api/todos/${item.id}/`).then((res) => this.refreshList());
+  // handleDelete = (item) => {
+  //   axios.delete(`/api/todos/${item.id}/`).then((res) => this.refreshList());
+  // };
+
+  handleDelete = async (item) => {
+    await axios({
+      method: "delete",
+      url: `/api/todos/${item.id}/`,
+      headers: { "X-CSRFToken": csrftoken },
+    }).then((res) => this.refreshList());
   };
 
   createItem = () => {
