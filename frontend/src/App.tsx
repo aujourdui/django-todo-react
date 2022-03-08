@@ -2,32 +2,7 @@ import React, { Component } from "react";
 import Modal from "./components/Modal";
 import axios from "axios";
 
-const todoItems = [
-  {
-    id: 1,
-    title: "Go to Market",
-    description: "Buy ingredients to prepare dinner",
-    completed: true,
-  },
-  {
-    id: 2,
-    title: "Study",
-    description: "Read Algebra and History textbook for the upcoming test",
-    completed: false,
-  },
-  {
-    id: 3,
-    title: "Sammy's books",
-    description: "Go to library to return Sammy's books",
-    completed: true,
-  },
-  {
-    id: 4,
-    title: "Article",
-    description: "Write article on how to use Django with React",
-    completed: false,
-  },
-];
+type MyProps = {};
 
 type MyState = {
   viewCompleted: boolean;
@@ -36,20 +11,20 @@ type MyState = {
   activeItem: {};
 };
 
-class App extends Component<MyState | any> {
-  // constructor(props) {
-  // super(props);
-  state: MyState = {
-    viewCompleted: false,
-    todoList: [],
-    modal: false,
-    activeItem: {
-      title: "",
-      description: "",
-      completed: false,
-    },
-  };
-  // }
+class App extends Component<MyProps, MyState> {
+  constructor(props: MyProps) {
+    super(props);
+    this.state = {
+      viewCompleted: false,
+      todoList: [],
+      modal: false,
+      activeItem: {
+        title: "",
+        description: "",
+        completed: false,
+      },
+    };
+  }
 
   componentDidMount() {
     this.refreshList();
@@ -66,7 +41,7 @@ class App extends Component<MyState | any> {
     this.setState({ modal: !this.state.modal });
   };
 
-  handleSubmit = (item: any) => {
+  handleSubmit = (item) => {
     this.toggle();
 
     if (item.id) {
@@ -78,7 +53,7 @@ class App extends Component<MyState | any> {
     axios.post("/api/todos/", item).then((res) => this.refreshList());
   };
 
-  handleDelete = (item: any) => {
+  handleDelete = (item) => {
     axios.delete(`/api/todos/${item.id}/`).then((res) => this.refreshList());
   };
 
@@ -88,11 +63,11 @@ class App extends Component<MyState | any> {
     this.setState({ activeItem: item, modal: !this.state.modal });
   };
 
-  editItem = (item: any) => {
+  editItem = (item) => {
     this.setState({ activeItem: item, modal: !this.state.modal });
   };
 
-  displayCompleted = (status: boolean) => {
+  displayCompleted = (status) => {
     if (status) {
       return this.setState({ viewCompleted: true });
     }
@@ -104,14 +79,14 @@ class App extends Component<MyState | any> {
     return (
       <div className="nav nav-tabs">
         <span
-          className={this.state.viewCompleted ? "nav-link active" : "nav-link"}
           onClick={() => this.displayCompleted(true)}
+          className={this.state.viewCompleted ? "nav-link active" : "nav-link"}
         >
           Complete
         </span>
         <span
-          className={this.state.viewCompleted ? "nav-link" : "nav-link active"}
           onClick={() => this.displayCompleted(false)}
+          className={this.state.viewCompleted ? "nav-link" : "nav-link active"}
         >
           Incomplete
         </span>
@@ -141,7 +116,7 @@ class App extends Component<MyState | any> {
         <span>
           <button
             className="btn btn-secondary mr-2"
-            onClick={() => this.setState(item)}
+            onClick={() => this.editItem(item)}
           >
             Edit
           </button>
@@ -155,6 +130,7 @@ class App extends Component<MyState | any> {
       </li>
     ));
   };
+
   render() {
     return (
       <main className="container">
