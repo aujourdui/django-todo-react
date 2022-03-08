@@ -22,12 +22,12 @@ type ModalProps = {
 };
 
 export default class CustomModal extends Component<ModalProps, ModalState> {
-  // constructor(props) {
-  // super(props);
-  state: ModalState = {
-    activeItem: this.props.activeItem,
-  };
-  // }
+  constructor(props: ModalProps) {
+    super(props);
+    this.state = {
+      activeItem: this.props.activeItem,
+    };
+  }
 
   handleChange = (e: { target: { value: any; checked?: any; name?: any } }) => {
     let { name, value } = e.target;
